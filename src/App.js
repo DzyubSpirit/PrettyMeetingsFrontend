@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom'
 import './App.css';
+import LoginForm from './Login';
 
 class App extends Component {
-  componentDidMount = () => {
-    setTimeout(() => {
-      this.refs.personInfo.setNickname("Vladka");
-    }, 2000);
-    const meetings = [
-      ['Take a beer', 'Take a beer with Sergey'],
-      ['Church event', 'Conquer Jerusalem'],
-    ].map(([title, text]) => (<Meeting title={title} text={text} />));
-    this.refs.meetings.addMeetings(meetings);
-  }
   render() {
     return (
       <div className="App">
@@ -20,10 +16,32 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <div>
-          <PersonInfo ref="personInfo" />
-          <Meetings ref="meetings" />
+        <div class="content">
+          { !localStorage.getItem('token') 
+          ? (<LoginForm />)
+          : (<LoggedInContent />)}
         </div>
+      </div>
+    );
+  }
+}
+
+class LoggedInContent extends Component {
+  componentDidMount = () => {
+    setTimeout(() => {
+      this.refs.personInfo.setNickname("Vladka");
+    }, 2000);
+    const meetings = [
+      ['Take a beer', '21.11.13 | 10:30-11:30', 'Take a beer with Sergey'],
+      ['Church event', '21.11.13 | 22:00 - 22.11.13 | 6:00', 'Conquer Jerusalem'],
+    ].map(([title, timeInterval, text]) => (<Meeting title={title} timeInterval={timeInterval} text={text} />));
+    this.refs.meetings.addMeetings(meetings);
+  }
+  render() {
+    return (
+      <div class="content">
+        <PersonInfo ref="personInfo" />
+        <Meetings ref="meetings" />
       </div>
     );
   }
@@ -47,15 +65,16 @@ class Meetings extends Component {
     this.setState({ meetings: this.state.meetings.concat(meetings) })
   }
   render() {
-    return (<ul> {this.state.meetings} </ul>);
+    return (<div class="meetings"> {this.state.meetings} </div>);
   }
 }
 
 class Meeting extends Component {
   render() {
     return (
-      <div>
+      <div class="meeting">
         <h5> {this.props.title} </h5>
+        <p> {this.props.timeInterval} </p>
         <p> {this.props.text} </p>
       </div>
     );
